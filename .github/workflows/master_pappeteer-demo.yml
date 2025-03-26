@@ -40,6 +40,8 @@ jobs:
       - name: 'Download chrome'
         run: |
           mkdir -p ./g-chrome
+          sudo chown -R $USER:$USER ./g-chrome
+          sudo chmod -R 755 ./g-chrome
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg-deb -x google-chrome-stable_current_amd64.deb ./g-chrome
           mv ./g-chrome/opt/google/chrome ./g-chrome/chrome
