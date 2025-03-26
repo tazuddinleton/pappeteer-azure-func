@@ -5,7 +5,7 @@ app.http('puppeteer-demo', {
     authLevel: 'anonymous',
     handler: async (request, context) => {
         
-        console.log(`Http function processed request for url "${request.url}"`);
+        context.log(`Http function processed request for url "${request.url}"`);
 
         const puppeteer = require('puppeteer-core');
         const { BlobServiceClient } = require('@azure/storage-blob');
@@ -15,6 +15,11 @@ app.http('puppeteer-demo', {
         const CONTAINER_NAME = 'screenshots';
         const CHROMIUM_EXECUTABLE_PATH = process.env.CHROMIUM_EXECUTABLE_PATH;
 
+        context.log(`Azure Storage connection string: ${AZURE_STORAGE_CONNECTION_STRING}`);
+        context.log(`Container name: ${CONTAINER_NAME}`);
+        context.log(`Chromium executable path: ${CHROMIUM_EXECUTABLE_PATH}`);
+
+
 
         // Extract the URL from the request or default to 'https://www.example.com'
         const url = request.params.url || 'https://www.google.com';
@@ -22,7 +27,10 @@ app.http('puppeteer-demo', {
         const parsedUrl = new URL(url);
         const hostname = parsedUrl.hostname;
 
+        context.log(`Taking a screenshot of the page at URL: ${url}`);
         try{
+            // Launch a new browser instance
+            context.log('Launching a new browser instance');
             const browser = await puppeteer.launch({
                 executablePath: CHROMIUM_EXECUTABLE_PATH , // Replace with the actual path to Chromium executable
                 args: ['--no-sandbox', '--disable-setuid-sandbox'], // Chromium flags
@@ -30,6 +38,7 @@ app.http('puppeteer-demo', {
             });
 
            
+
             // Open a new page in the browser
             const page = await browser.newPage();
 
@@ -42,6 +51,7 @@ app.http('puppeteer-demo', {
             // Close the browser
             await browser.close();
 
+            context.log('Screenshot taken');
             // Create a BlobServiceClient object using the Azure Storage connection string
             const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
 
@@ -52,8 +62,8 @@ app.http('puppeteer-demo', {
             const blobName = `${hostname}.png`;
             const blockBlobClient = containerClient.getBlockBlobClient(blobName);
             await blockBlobClient.upload(screenshotBuffer, screenshotBuffer.length);
-
-            console.log('Screenshot uploaded to Azure Blob Storage');
+            
+            context.log('Screenshot uploaded to Azure Blob Storage');
             context.res = {
                 status: 200,
                 body: 'Screenshot uploaded to Azure Blob Storage'
@@ -63,7 +73,7 @@ app.http('puppeteer-demo', {
 
         }
         catch(err){
-            console.log(err);
+            context.log(err.message);
             return {
                 status: 500,
                 body: 'An error occurred while taking a screenshot'
