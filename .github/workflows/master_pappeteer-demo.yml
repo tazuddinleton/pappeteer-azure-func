@@ -43,7 +43,7 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg-deb -x google-chrome-stable_current_amd64.deb ./g-chrome
           sudo mv ./g-chrome/opt/google/chrome ./g-chrome/chrome
-          chmod +x ./g-chrome/chrome/google-chrome
+          sudo chmod +x ./g-chrome/chrome/google-chrome
 
 
       - name: Zip artifact for deployment
