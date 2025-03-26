@@ -4,9 +4,8 @@ app.http('puppeteer-demo', {
     methods: ['GET', 'POST'],
     authLevel: 'anonymous',
     handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
-
-
+        
+        console.log(`Http function processed request for url "${request.url}"`);
 
         const puppeteer = require('puppeteer-core');
         const { BlobServiceClient } = require('@azure/storage-blob');
@@ -54,7 +53,7 @@ app.http('puppeteer-demo', {
             const blockBlobClient = containerClient.getBlockBlobClient(blobName);
             await blockBlobClient.upload(screenshotBuffer, screenshotBuffer.length);
 
-            context.log('Screenshot uploaded to Azure Blob Storage');
+            console.log('Screenshot uploaded to Azure Blob Storage');
             context.res = {
                 status: 200,
                 body: 'Screenshot uploaded to Azure Blob Storage'
@@ -64,7 +63,7 @@ app.http('puppeteer-demo', {
 
         }
         catch(err){
-            context.log(err);
+            console.log(err);
             return {
                 status: 500,
                 body: 'An error occurred while taking a screenshot'
