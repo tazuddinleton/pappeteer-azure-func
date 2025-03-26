@@ -39,11 +39,19 @@ jobs:
 
       - name: 'Download chrome'
         run: |
-          mkdir -p ./g-chrome         
+          mkdir -p ./g-chrome
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg-deb -x google-chrome-stable_current_amd64.deb ./g-chrome
           sudo mv ./g-chrome/opt/google/chrome ./g-chrome/chrome
-          sudo chmod +x ./g-chrome/chrome/google-chrome
+
+          # Change ownership to the current user
+          sudo chown -R $USER:$USER ./g-chrome
+
+          # Grant execute permissions for the user
+          sudo chmod -R +x ./g-chrome
+
+          # Confirm if the files are now owned by the user
+          ls -l ./g-chrome/chrome
 
 
       - name: Zip artifact for deployment
